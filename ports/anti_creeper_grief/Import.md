@@ -1,1 +1,0 @@
-Creating the anti_creeper_grief subfolder

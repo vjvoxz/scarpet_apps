@@ -2,20 +2,21 @@
 
 All notable changes to the Assembled Slabs scarpet app will be documented in this file.
 
-## [v1.4.0]  (2026-##-##)
-- Added support for unmapped slabs in Minecraft Java Edition 26.3 "?".
-- Extended global_slab_to_block dictionary with new slab-to-block mappings.
-- Fixed warnings for missing slab definitions.
+## [v1.2.3]  (2026-07-21)
+- The full-block drop in __on_player_breaks_block spawned at a fixed offset ([0.5, 0.2, 0.5]) with no motion, so it looked stiff/unnatural compared to vanilla drops. It now spawns at a randomized position within the block (X/Z offset 0.15-0.85, matching vanilla's own spread) and gets a small random horizontal drift plus a gentle upward pop, using rand() and modify(item, 'motion', ...).
 
-## [v1.3.0]  (2026-##-##)
-- Added support for unmapped slabs in Minecraft Java Edition 26.2 "Chaos Cubed".
-- Extended global_slab_to_block dictionary with new slab-to-block mappings.
-- Fixed warnings for missing slab definitions.
+## [v1.2.2]  (2026-07-21)
+- Root-caused the flood of "unmapped slab" warnings on startup: block_list('slabs') (confirmed via in-game test) reports vanilla block ids with the 'minecraft:' namespace stripped (e.g.'oak_slab'), but keeps it for modded ids (e.g.'cinchsmissingblocks:calcite_slab'). global_slab_to_block always uses the fully namespaced id for every entry, so has() was being asked for keys like 'oak_slab' that don't exist in the table (the real key is 'minecraft:oak_slab'), silently false-flagging every vanilla slab as unmapped.
+- The same mismatch affects __on_player_breaks_block's lookup (global_slab_to_block:str(block)), which could have prevented the full-block drop from ever triggering for vanilla double slabs, since only modded ids happened to already match the table's format.
+- Added full_id(), which adds back the 'minecraft:' prefix to any id that doesn't already carry a namespace, and applied it at both lookup sites (audit_slab_map and __on_player_breaks_block) instead of rewriting the table.
+## [v1.2.1]  (2026-07-21) 
+- Fixed guess_full_block(): it had a namespace-stripping branch, `if (slice(id, 0, 10) == 'minecraft', slice(id, 10), id)`, meant to trim a leading "minecraft:" off suggested ids. slice(id, 0, 10) keeps 10 characters, which includes the trailing colon ("minecraft:"), but it was compared against the 9-character literal 'minecraft' (no colon), so the branch could never be true and was dead code for every slab, vanilla or modded.
+- That stripping was also solving the wrong problem: every existing entry in global_slab_to_block, vanilla and modded alike, keeps its full namespaced id (e.g. 'minecraft:acacia_planks', 'cinchsmissingblocks:mossy_mud_bricks'). Fixing the slice math instead of removing it would have made guess_full_block() start stripping "minecraft:" off vanilla suggestions, producing entries inconsistent with the rest of the table.
+- guess_full_block() now returns the raw ingredient id exactly as reported by recipe_data(), with no reformatting.
 
-## [v1.2.0]  (2026-07-19)
-- Added support for unmapped slabs in cinchsmissingblocks pack.
-- Extended global_slab_to_block dictionary with new slab-to-block mappings.
-- Fixed warnings for missing slab definitions.
+## [v1.2.0]  (2026-07-21)
+- Added slab mappings for the "Cinch's Missing Blocks" mod.
+- Added audit_slab_map() / guess_full_block() to detect slabs missing from global_slab_to_block and suggest a mapping for them on startup.
 
 ## [v1.1.1]  (2026-07-17)
 - Added global_slab_audit_ignore, a dedicated exclusion set for legacy/special-case slabs with no full-block equivalent (currently: 'petrified_oak_slab'). audit_slab_map() now skips anything in this set instead of flagging it as unmapped on every startup. 

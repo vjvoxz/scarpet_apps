@@ -8,7 +8,7 @@ Apiarist Suit is a [Carpet Mod](https://github.com/gnembon/fabric-carpet) `scarp
 - **Step 2: Bee Detection**  
   If equipped, the app scans for bees within a 2-block radius around the player.
 - **Step 3: Calm Effect**  
-  Any nearby bees that are angry (have a target) are calmed: their `AngerTime` is reset to `0`, and their target is cleared.
+  Any nearby bees that are angry (have a target) are calmed: their `angry_at` is reset to `0`, and their target is cleared.
 
 ## Features
 - **Bee Protection**: Prevents bees from stinging when the player wears full chainmail.

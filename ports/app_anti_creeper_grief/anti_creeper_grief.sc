@@ -32,7 +32,7 @@ __config() -> {
    'commands' -> {
       ''     -> 'info',
       'info' -> 'info',
-      'status <state>' -> 'set_grief'
+      'enable <state>' -> 'set_grief'
     },
     'arguments' -> {
         'state' -> { 'type' -> 'bool' }
@@ -40,18 +40,19 @@ __config() -> {
 };
 
 //----------------------------------------------------------------------
-// Command interface: /anti_creeper_grief [info|status <state>]
+// Command interface: /anti_creeper_grief [info|enable <state>]
 //----------------------------------------------------------------------
 // Registers the /anti_creeper_grief info command
 info() -> (
     print(format('db Anti Creeper Grief'));
     print(format('gi Prevents creepers from blowing up holes'));
     print(format('gi Created by: vjvoxz (Ported from Vanilla Tweaks)'));
+    print(format('wi Version: 1.1.0'));
     print(format('p License: MIT'));
     
     // Display current running status
-    status_style = if(global_enabled, 'e  Enabled', 'r  Disabled');
-    print(format('nu Status:', status_style));
+    enable_style = if(global_enabled, 'l  Enabled', 'r  Disabled');
+    print(format('nu Status:', enable_style));
 );
 
 // Toggles the grief prevention mechanic on the fly
